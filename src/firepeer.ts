@@ -1,67 +1,48 @@
 import { EventEmitter } from 'events';
-import * as firebase from 'firebase';
+import firebase from 'firebase';
 import * as SimplePeer from 'simple-peer';
 import debug from './debug';
 
 export declare interface FirePeer {
   on(event: 'connection', listener: (peer: SimplePeer.Instance) => void): this;
-  on(event: string | 'destroy', listener: () => void): this;
 }
 
 export interface FirePeerOptions {
   wrtc?: any;
-  user?: firebase.User;
+  peersPath?: string;
   offersPath?: string;
   answerPath?: string;
   uidPath?: string;
 }
 
 export class FirePeer extends EventEmitter {
-  private offers: firebase.database.Reference | null;
-  private offersSub: any;
+  private ref?: firebase.database.Reference;
+  private refSub: any;
   private wrtc?: any;
-  private user?: firebase.User;
+  private user: firebase.User | null | undefined;
+  private peersPath = 'peers';
   private offersPath = 'offers';
   private answerPath = 'answer';
   private uidPath = 'uid';
 
-  constructor(
-    myRef?: firebase.database.Reference | FirePeerOptions,
-    options?: FirePeerOptions
-  ) {
+  constructor(private fb: typeof firebase, options?: FirePeerOptions) {
     super();
-    if (myRef && 'ref' in myRef) {
-      this.offers = myRef.child(this.offersPath);
-      Object.assign(this, options);
-    } else {
-      this.offers = null;
-      Object.assign(this, myRef);
-    }
+    Object.assign(this, options);
 
-    if (this.offers) {
-      debug('constructor() listening to %s', this.offers.toString());
-      this.offersSub = this.offers.on('child_added', offerSnapshot => {
-        if (offerSnapshot) {
-          const offer = offerSnapshot.val() as SimplePeer.SignalData;
-          if (offer) {
-            this.incoming(offerSnapshot.ref, offer);
-          }
-        }
-      });
-    }
+    this.fb.auth().onAuthStateChanged(user => {
+      this.user = user;
+      if (this.user) {
+        this.listen(this.user);
+      } else {
+        this.unlisten();
+      }
+    });
   }
 
-  public destroy(): void {
-    if (this.offers && this.offersSub) {
-      this.offers.off('child_added', this.offersSub);
-    }
-    this.emit('destroy');
-  }
-
-  public connect(
-    otherRef: firebase.database.Reference
-  ): Promise<SimplePeer.Instance> {
-    const offersRef = otherRef.child(this.offersPath);
+  public connect(id: string): Promise<SimplePeer.Instance> {
+    const offersRef = this.fb
+      .database()
+      .ref(`${this.peersPath}/${id}/${this.offersPath}`);
 
     debug('connect() %s', offersRef.toString());
 
@@ -119,6 +100,28 @@ export class FirePeer extends EventEmitter {
         });
       });
     });
+  }
+
+  private listen(user: firebase.User): void {
+    this.ref = this.fb
+      .database()
+      .ref(`${this.peersPath}/${user.uid}/${this.offersPath}`);
+
+    debug('listen() to %s', this.ref.toString());
+    this.refSub = this.ref.on('child_added', offerSnapshot => {
+      if (offerSnapshot) {
+        const offer = offerSnapshot.val() as SimplePeer.SignalData;
+        if (offer) {
+          this.incoming(offerSnapshot.ref, offer);
+        }
+      }
+    });
+  }
+
+  private unlisten(): void {
+    if (this.ref && this.refSub) {
+      this.ref.off('child_added', this.refSub);
+    }
   }
 
   private incoming(

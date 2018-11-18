@@ -1,7 +1,7 @@
 {
   "name": "firepeer",
-  "version": "0.0.8",
-  "description": "simple-peer signalling through firebase",
+  "version": "0.0.7",
+  "description": "easy and secure signalling for simple-peer through firebase",
   "main": "lib/firepeer.js",
   "browser": "lib/firepeer.min.js",
   "typings": "lib/firepeer.d.ts",
@@ -27,7 +27,7 @@
     "test": "run-s clean build test:*",
     "test:lint": "tslint --project .",
     "test:prettier": "prettier \"src/**/*.ts\" --list-different",
-    "test:unit": "cross-env DEBUG=firepeer ava lib/test/unit/*.test.js",
+    "t:unit": "cross-env DEBUG=firepeer ava lib/test/unit/*.test.js",
     "test:int": "cross-env DEBUG=firepeer ava lib/test/int/*.test.js",
     "doc": "typedoc src/ --target ES6 --mode file --theme markdown --exclude \"**/*+(spec|fixture|test).ts\" --excludeProtected --excludePrivate --out reference",
     "version": "standard-version",
