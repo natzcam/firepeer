@@ -2,7 +2,7 @@ import test from 'ava';
 import * as dotenv from 'dotenv';
 dotenv.config();
 import * as wrtc from 'wrtc';
-import { FirePeer } from '../../firepeer';
+import { FirePeer } from '../firepeer';
 import firebase from './firebase.fixture';
 
 test.before(async t => {
