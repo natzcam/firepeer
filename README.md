@@ -6,8 +6,8 @@ secure signalling and authentication for [simple-peer](https://github.com/feross
 
 ### setup firebase
 
-  https://firebase.google.com/docs/web/setup
-  https://firebase.google.com/docs/database/web/start
+* https://firebase.google.com/docs/web/setup
+* https://firebase.google.com/docs/database/web/start
 
 Basically, you'll need to create a firebase project and setup the JS client SDK:
 
@@ -42,6 +42,7 @@ You need to configure your [security rules](https://firebase.google.com/docs/dat
 
 ### configure authentication method
 You will also need to configure your preferred authentication method:
+
 `https://console.firebase.google.com/u/0/project/<YOUR PROJECT ID>/authentication/providers`
 
 Right now, firebase supports Email/Password, Phone, Google, Facebook, Twitter, Github, or Anonymous sign-in methods.
