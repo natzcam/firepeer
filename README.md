@@ -6,8 +6,8 @@ secure signalling and authentication for [simple-peer](https://github.com/feross
 
 ### setup firebase
 
-https://firebase.google.com/docs/web/setup
-https://firebase.google.com/docs/database/web/start
+  https://firebase.google.com/docs/web/setup
+  https://firebase.google.com/docs/database/web/start
 
 Basically, you'll need to create a firebase project and setup the JS client SDK:
 
@@ -19,7 +19,7 @@ firebase.initializeApp({
 
 ### configure security rules
 
-You need to configure your [security rules](https://firebase.google.com/docs/database/security) in the [console](https://console.firebase.google.com) like below to secure the signalling data. What this means is only the user with uid of `$uid` can access offers sent by peers (`/peers/$uid/offers`) and only the peer who sent the offer can access the offer (`/peers/$uid/offers/$offerId`) and the corresponding answer (`/peers/$uid/offers/$offerId/answer`). This also guarantees that `/peers/$uid/offers/$offerId/uid` is the uid of the user that sent the offer.
+You need to configure your [security rules](https://firebase.google.com/docs/database/security) in the [console](https://console.firebase.google.com) like below, to secure the signalling data. What this means is only the user with uid of `$uid` can access offers sent by peers (`/peers/$uid/offers`) and only the peer who sent the offer can access the offer (`/peers/$uid/offers/$offerId`) and the corresponding answer (`/peers/$uid/offers/$offerId/answer`). This also guarantees that `/peers/$uid/offers/$offerId/uid` is the uid of the user that sent the offer.
 
 ```javascript
 {
@@ -94,4 +94,9 @@ bob.on('connection', (connection)=>{
 
 > Connections are just instances of [SimplePeer](https://github.com/feross/simple-peer#api) already connected!
 
-## API
+## Demo
+
+P2P chat made with firepeer in 100 lines of JS, more or less. :D
+https://firepeer-demo.firebaseapp.com
+https://github.com/natzcam/firepeer-demo
+
