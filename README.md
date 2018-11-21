@@ -98,6 +98,7 @@ bob.on('connection', (connection)=>{
 ## Demo
 
 P2P chat made with firepeer in 100 lines of JS, more or less. :D
-https://firepeer-demo.firebaseapp.com
-https://github.com/natzcam/firepeer-demo
+
+* https://firepeer-demo.firebaseapp.com
+* https://github.com/natzcam/firepeer-demo
 
