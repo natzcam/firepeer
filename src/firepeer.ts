@@ -7,12 +7,17 @@ export declare interface FirePeer {
   on(event: 'connection', listener: (peer: SimplePeer.Instance) => void): this;
 }
 
+export interface Signal extends SimplePeer.SignalData {
+  uid: string;
+}
+
 export interface FirePeerOptions {
   wrtc?: any;
   peersPath?: string;
   offersPath?: string;
   answerPath?: string;
   uidPath?: string;
+  allowOffer?: (offer: Signal) => any;
 }
 
 export class FirePeer extends EventEmitter {
@@ -24,6 +29,7 @@ export class FirePeer extends EventEmitter {
   private offersPath = 'offers';
   private answerPath = 'answer';
   private uidPath = 'uid';
+  private allowOffer: (offer: Signal) => boolean = (offer: Signal) => true;
 
   constructor(private fb: typeof firebase, options?: FirePeerOptions) {
     super();
@@ -52,6 +58,7 @@ export class FirePeer extends EventEmitter {
         trickle: false,
         wrtc: this.wrtc
       });
+      (peer as any).uid = id;
 
       peer.on('signal', (offer: any) => {
         if (this.user) {
@@ -68,7 +75,7 @@ export class FirePeer extends EventEmitter {
         const answerSub: any = answerRef.on(
           'value',
           ss => {
-            const answer = ss && (ss.val() as SimplePeer.SignalData);
+            const answer = ss && (ss.val() as Signal);
             if (answer) {
               debug('connect() answer: %o', answer);
               peer.signal(answer);
@@ -80,11 +87,9 @@ export class FirePeer extends EventEmitter {
         );
 
         const cleanup = (err?: Error) => {
+          debug('connect() cleanup');
           if (answerRef && answerSub) {
             answerRef.off('value', answerSub);
-          }
-          if (offerRef) {
-            offerRef.set(null);
           }
           if (err) {
             debug(err);
@@ -97,6 +102,7 @@ export class FirePeer extends EventEmitter {
           cleanup();
           peer.removeListener('error', cleanup);
           resolve(peer);
+          this.emit('connection', peer);
         });
       });
     });
@@ -110,9 +116,14 @@ export class FirePeer extends EventEmitter {
     debug('listen() to %s', this.ref.toString());
     this.refSub = this.ref.on('child_added', offerSnapshot => {
       if (offerSnapshot) {
-        const offer = offerSnapshot.val() as SimplePeer.SignalData;
+        const offer = offerSnapshot.val() as Signal;
         if (offer) {
-          this.incoming(offerSnapshot.ref, offer);
+          if (this.allowOffer(offer)) {
+            this.incoming(offerSnapshot.ref, offer);
+          } else {
+            offerSnapshot.ref.set(null);
+            debug('listen() disallowed offer');
+          }
         }
       }
     });
@@ -124,15 +135,13 @@ export class FirePeer extends EventEmitter {
     }
   }
 
-  private incoming(
-    ref: firebase.database.Reference,
-    offer: SimplePeer.SignalData
-  ): void {
+  private incoming(ref: firebase.database.Reference, offer: Signal): void {
     const peer = new SimplePeer({
       initiator: false,
       trickle: false,
       wrtc: this.wrtc
     });
+    (peer as any).uid = offer.uid;
 
     const cleanup = (err?: Error) => {
       if (err) {
@@ -142,7 +151,7 @@ export class FirePeer extends EventEmitter {
     };
 
     debug('incoming() offer: %o', offer);
-    peer.on('signal', (answer: SimplePeer.SignalData) => {
+    peer.on('signal', (answer: Signal) => {
       debug('incoming() answer: %o', answer);
       ref.child(this.answerPath).set(answer);
     });

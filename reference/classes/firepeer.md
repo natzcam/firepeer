@@ -22,7 +22,6 @@
 
 * [addListener](firepeer.md#addlistener)
 * [connect](firepeer.md#connect)
-* [destroy](firepeer.md#destroy)
 * [emit](firepeer.md#emit)
 * [eventNames](firepeer.md#eventnames)
 * [getMaxListeners](firepeer.md#getmaxlisteners)
@@ -47,15 +46,15 @@
 
 ###  constructor
 
-⊕ **new FirePeer**(myRef?: * `Reference` &#124; [FirePeerOptions](../interfaces/firepeeroptions.md)*, options?: *[FirePeerOptions](../interfaces/firepeeroptions.md)*): [FirePeer](firepeer.md)
+⊕ **new FirePeer**(fb: *`firebase`*, options?: *[FirePeerOptions](../interfaces/firepeeroptions.md)*): [FirePeer](firepeer.md)
 
-*Defined in firepeer.ts:26*
+*Defined in [firepeer.ts:32](https://github.com/natzcam/firepeer/blob/06dbb88/src/firepeer.ts#L32)*
 
 **Parameters:**
 
 | Param | Type |
 | ------ | ------ |
-| `Optional` myRef |  `Reference` &#124; [FirePeerOptions](../interfaces/firepeeroptions.md)|
+| fb | `firebase` |
 | `Optional` options | [FirePeerOptions](../interfaces/firepeeroptions.md) |
 
 **Returns:** [FirePeer](firepeer.md)
@@ -104,28 +103,17 @@ ___
 
 ###  connect
 
-▸ **connect**(otherRef: *`Reference`*): `Promise`<`Instance`>
+▸ **connect**(id: *`string`*): `Promise`<`Instance`>
 
-*Defined in firepeer.ts:61*
+*Defined in [firepeer.ts:48](https://github.com/natzcam/firepeer/blob/06dbb88/src/firepeer.ts#L48)*
 
 **Parameters:**
 
 | Param | Type |
 | ------ | ------ |
-| otherRef | `Reference` |
+| id | `string` |
 
 **Returns:** `Promise`<`Instance`>
-
-___
-<a id="destroy"></a>
-
-###  destroy
-
-▸ **destroy**(): `void`
-
-*Defined in firepeer.ts:54*
-
-**Returns:** `void`
 
 ___
 <a id="emit"></a>
@@ -250,30 +238,15 @@ ___
 
 ▸ **on**(event: *"connection"*, listener: *`function`*): `this`
 
-▸ **on**(event: * `string` &#124; "destroy"*, listener: *`function`*): `this`
-
 *Overrides EventEmitter.on*
 
-*Defined in firepeer.ts:7*
+*Defined in [firepeer.ts:7](https://github.com/natzcam/firepeer/blob/06dbb88/src/firepeer.ts#L7)*
 
 **Parameters:**
 
 | Param | Type |
 | ------ | ------ |
 | event | "connection" |
-| listener | `function` |
-
-**Returns:** `this`
-
-*Overrides EventEmitter.on*
-
-*Defined in firepeer.ts:8*
-
-**Parameters:**
-
-| Param | Type |
-| ------ | ------ |
-| event |  `string` &#124; "destroy"|
 | listener | `function` |
 
 **Returns:** `this`

@@ -1,23 +1,25 @@
-
-firepeer
-========
+# firepeer
 
 secure signalling and authentication for [simple-peer](https://github.com/feross/simple-peer) using [firebase realtime database](https://firebase.google.com/docs/database/).
 
-## setup firebase
+## Getting Started
 
-Follow the instructions here:
-1. https://firebase.google.com/docs/web/setup
-2. https://firebase.google.com/docs/database/web/start.
+### setup firebase
+
+https://firebase.google.com/docs/web/setup
+https://firebase.google.com/docs/database/web/start
 
 Basically, you'll need to create a firebase project and setup the JS client SDK:
+
 ```javascript
-  firebase.initializeApp({
-      //values from firebase console
-  });
+firebase.initializeApp({
+  //values from firebase console
+});
 ```
 
-You will also need to add these in your [security rules](https://firebase.google.com/docs/database/security) through the [console](https://console.firebase.google.com).  
+### configure security rules
+
+You need to configure your [security rules](https://firebase.google.com/docs/database/security) in the [console](https://console.firebase.google.com) like below to secure the signalling data. What this means is only the user with uid of `$uid` can access offers sent by peers (`/peers/$uid/offers`) and only the peer who sent the offer can access the offer (`/peers/$uid/offers/$offerId`) and the corresponding answer (`/peers/$uid/offers/$offerId/answer`). This also guarantees that `/peers/$uid/offers/$offerId/uid` is the uid of the user that sent the offer.
 
 ```javascript
 {
@@ -38,57 +40,58 @@ You will also need to add these in your [security rules](https://firebase.google
 }
 ```
 
-## install firepeer
+### configure authentication method
+You will also need to configure your preferred authentication method:
+`https://console.firebase.google.com/u/0/project/<YOUR PROJECT ID>/authentication/providers`
+
+Right now, firebase supports Email/Password, Phone, Google, Facebook, Twitter, Github, or Anonymous sign-in methods.
+
+More details here:
+https://firebase.google.com/docs/auth/web/start
+
+### install firepeer
+
 ```sh
 npm install firepeer
 ```
+
 or
+
 ```html
 <script src="https://cdn.jsdelivr.net/npm/firepeer@0.0.7/build/lib/firepeer.min.js"></script>
 ```
 
-## use firepeer
+### use firepeer
+
 ```javascript
 //alice side
+const alice = new FirePeer(firebase);
 
-const cred = await firebase.auth().signInWith**() //sign in with any method as alice;
+//authenticate
+await firebase.auth().signInWith**() 
 
-const firepeer = new FirePeer({
-  user: cred.user,
-  ref: firebase.database().ref(`/users/${cred.user.uid}`)
-});
-
-// initiate connection
-const connection = await alice.connect(firebase.database.ref('users/<uid of bob>'));
+// wait for connection
+const connection = await alice.connect(<uid of bob>);
 
 // send a mesage to bob
 connection.send('hello')
 ```
+
 ```javascript
 // bob side
+const bob = new FirePeer(firebase);
 
-// create a receiver
-const cred = await firebase.auth().signInWith**() //sign in with any method as bob;
-
-const firepeer = new FirePeer({
-  user: cred.user,
-  ref: firebase.database().ref(`/users/${cred.user.uid}`)
-});
+//authenticate
+await firebase.auth().signInWith**()
 
 // wait for connection and receive message
-receiver.on('connection', (connection)=>{
+bob.on('connection', (connection)=>{
     connection.on('data', (data)=>{
         console.log(data) //hello
     })
 })
 ```
-## how this works?
-When a reference is passed through `new FirePeer()`, firepeer will create a child name `offers` under that reference and listen to any child_added event on that node. When a reference is passed through `.connect()`, firepeer will create a new child under `offers`.
-
-The rules ensure that only user with $uid, will read and write access
-
-Use firepeer to establish a p2p connection:
-
 
 > Connections are just instances of [SimplePeer](https://github.com/feross/simple-peer#api) already connected!
 
+## API
