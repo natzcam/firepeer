@@ -28,7 +28,7 @@
 **● allowOffer**: * `undefined` &#124; `function`
 *
 
-*Defined in [firepeer.ts:20](https://github.com/natzcam/firepeer/blob/06dbb88/src/firepeer.ts#L20)*
+*Defined in [firepeer.ts:20](https://github.com/natzcam/firepeer/blob/73e993c/src/firepeer.ts#L20)*
 
 ___
 <a id="answerpath"></a>
@@ -38,7 +38,7 @@ ___
 **● answerPath**: * `undefined` &#124; `string`
 *
 
-*Defined in [firepeer.ts:18](https://github.com/natzcam/firepeer/blob/06dbb88/src/firepeer.ts#L18)*
+*Defined in [firepeer.ts:18](https://github.com/natzcam/firepeer/blob/73e993c/src/firepeer.ts#L18)*
 
 ___
 <a id="offerspath"></a>
@@ -48,7 +48,7 @@ ___
 **● offersPath**: * `undefined` &#124; `string`
 *
 
-*Defined in [firepeer.ts:17](https://github.com/natzcam/firepeer/blob/06dbb88/src/firepeer.ts#L17)*
+*Defined in [firepeer.ts:17](https://github.com/natzcam/firepeer/blob/73e993c/src/firepeer.ts#L17)*
 
 ___
 <a id="peerspath"></a>
@@ -58,7 +58,7 @@ ___
 **● peersPath**: * `undefined` &#124; `string`
 *
 
-*Defined in [firepeer.ts:16](https://github.com/natzcam/firepeer/blob/06dbb88/src/firepeer.ts#L16)*
+*Defined in [firepeer.ts:16](https://github.com/natzcam/firepeer/blob/73e993c/src/firepeer.ts#L16)*
 
 ___
 <a id="uidpath"></a>
@@ -68,7 +68,7 @@ ___
 **● uidPath**: * `undefined` &#124; `string`
 *
 
-*Defined in [firepeer.ts:19](https://github.com/natzcam/firepeer/blob/06dbb88/src/firepeer.ts#L19)*
+*Defined in [firepeer.ts:19](https://github.com/natzcam/firepeer/blob/73e993c/src/firepeer.ts#L19)*
 
 ___
 <a id="wrtc"></a>
@@ -77,7 +77,7 @@ ___
 
 **● wrtc**: *`any`*
 
-*Defined in [firepeer.ts:15](https://github.com/natzcam/firepeer/blob/06dbb88/src/firepeer.ts#L15)*
+*Defined in [firepeer.ts:15](https://github.com/natzcam/firepeer/blob/73e993c/src/firepeer.ts#L15)*
 
 ___
 

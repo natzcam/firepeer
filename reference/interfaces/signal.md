@@ -48,7 +48,7 @@ ___
 
 **● uid**: *`string`*
 
-*Defined in [firepeer.ts:11](https://github.com/natzcam/firepeer/blob/06dbb88/src/firepeer.ts#L11)*
+*Defined in [firepeer.ts:11](https://github.com/natzcam/firepeer/blob/73e993c/src/firepeer.ts#L11)*
 
 ___
 

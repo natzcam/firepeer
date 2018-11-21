@@ -28,7 +28,7 @@
     "test:lint": "tslint --project .",
     "test:prettier": "prettier \"src/**/*.ts\" --list-different",
     "test:int": "cross-env DEBUG=firepeer ava lib/test/*.test.js",
-    "doc": "typedoc src/ --target ES6 --mode file --theme markdown --exclude \"**/*+(spec|fixture|test).ts\" --excludeProtected --excludePrivate --out reference",
+    "doc": "typedoc src/firepeer.ts --target ES6 --mode file --theme markdown --excludeProtected --excludePrivate --excludeExternals --out reference",
     "version": "standard-version",
     "release": "run-s test doc version",
     "unit": "run-s clean build test:unit",

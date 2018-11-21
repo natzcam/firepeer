@@ -48,7 +48,7 @@
 
 ⊕ **new FirePeer**(fb: *`firebase`*, options?: *[FirePeerOptions](../interfaces/firepeeroptions.md)*): [FirePeer](firepeer.md)
 
-*Defined in [firepeer.ts:32](https://github.com/natzcam/firepeer/blob/06dbb88/src/firepeer.ts#L32)*
+*Defined in [firepeer.ts:32](https://github.com/natzcam/firepeer/blob/73e993c/src/firepeer.ts#L32)*
 
 **Parameters:**
 
@@ -105,7 +105,7 @@ ___
 
 ▸ **connect**(id: *`string`*): `Promise`<`Instance`>
 
-*Defined in [firepeer.ts:48](https://github.com/natzcam/firepeer/blob/06dbb88/src/firepeer.ts#L48)*
+*Defined in [firepeer.ts:48](https://github.com/natzcam/firepeer/blob/73e993c/src/firepeer.ts#L48)*
 
 **Parameters:**
 
@@ -240,7 +240,7 @@ ___
 
 *Overrides EventEmitter.on*
 
-*Defined in [firepeer.ts:7](https://github.com/natzcam/firepeer/blob/06dbb88/src/firepeer.ts#L7)*
+*Defined in [firepeer.ts:7](https://github.com/natzcam/firepeer/blob/73e993c/src/firepeer.ts#L7)*
 
 **Parameters:**
 
