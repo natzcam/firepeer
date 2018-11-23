@@ -12,25 +12,23 @@ export interface Signal extends SimplePeer.SignalData {
 }
 
 export interface FirePeerOptions {
-  wrtc?: any;
+  spOpts?: SimplePeer.Options;
   peersPath?: string;
   offersPath?: string;
   answerPath?: string;
   uidPath?: string;
-  allowOffer?: (offer: Signal) => any;
+  allowOffer?: (offer: Signal) => boolean;
 }
 
 export class FirePeer extends EventEmitter {
   private ref?: firebase.database.Reference;
   private refSub: any;
-  private wrtc?: any;
+  private spOpts: SimplePeer.Options = { trickle: false };
   private user: firebase.User | null | undefined;
   private peersPath = 'peers';
   private offersPath = 'offers';
   private answerPath = 'answer';
   private uidPath = 'uid';
-  private allowOffer: (offer: Signal) => boolean = (offer: Signal) => true;
-
   constructor(private fb: typeof firebase, options?: FirePeerOptions) {
     super();
     Object.assign(this, options);
@@ -45,20 +43,20 @@ export class FirePeer extends EventEmitter {
     });
   }
 
-  public connect(id: string): Promise<SimplePeer.Instance> {
+  public connect(uid: string): Promise<SimplePeer.Instance> {
     const offersRef = this.fb
       .database()
-      .ref(`${this.peersPath}/${id}/${this.offersPath}`);
+      .ref(`${this.peersPath}/${uid}/${this.offersPath}`);
 
     debug('connect() %s', offersRef.toString());
 
     return new Promise((resolve, reject) => {
       const peer = new SimplePeer({
         initiator: true,
-        trickle: false,
-        wrtc: this.wrtc
+        ...this.spOpts,
+        trickle: false
       });
-      (peer as any).uid = id;
+      (peer as any).uid = uid;
 
       peer.on('signal', (offer: any) => {
         if (this.user) {
@@ -107,6 +105,7 @@ export class FirePeer extends EventEmitter {
       });
     });
   }
+  private allowOffer: (offer: Signal) => boolean = (offer: Signal) => true;
 
   private listen(user: firebase.User): void {
     this.ref = this.fb
@@ -138,8 +137,8 @@ export class FirePeer extends EventEmitter {
   private incoming(ref: firebase.database.Reference, offer: Signal): void {
     const peer = new SimplePeer({
       initiator: false,
-      trickle: false,
-      wrtc: this.wrtc
+      ...this.spOpts,
+      trickle: false
     });
     (peer as any).uid = offer.uid;
 
