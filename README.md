@@ -107,7 +107,7 @@ bob.on('connection', (connection)=>{
 })
 ```
 
-> Connections are just instances of [SimplePeer](https://github.com/feross/simple-peer#api) already connected!
+> **Connections are just instances of [SimplePeer](https://github.com/feross/simple-peer#api) already connected!**
 
 ## API
 ### `firepeer = new FirePeer(firebase, options?: FirePeerOptions)`
