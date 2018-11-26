@@ -7,8 +7,8 @@ secure signalling and authentication for [simple-peer](https://github.com/feross
 ### setup firebase
 
 Create a firebase project and setup the JS client SDK.
-https://firebase.google.com/docs/web/setup
-https://firebase.google.com/docs/database/web/start
+* https://firebase.google.com/docs/web/setup
+* https://firebase.google.com/docs/database/web/start
 
 ### configure security rules
 
@@ -46,7 +46,7 @@ Ensures that offers are private to a user and can't be read or written by anyone
 ```
 Ensures that only the user who sent the offer has read and one-time write access to that specific offer. Also guarantees that `/peers/$uid/offers/$offerId/uid` is the uid of the user who sent that offer. Crucial in authenticating the other peer.
 
-https://firebase.google.com/docs/database/security
+* https://firebase.google.com/docs/database/security
 
 ### enable sign-in method
 By default, firebase does not enable any sign-in method. You will have to enable one in the firebase console. Right now, firebase supports Email/Password, Phone, Google, Facebook, Twitter, Github, or Anonymous sign-in methods.
@@ -55,7 +55,7 @@ Shortcut:
 `https://console.firebase.google.com/u/0/project/<YOUR_PROJECT_ID>/authentication/providers`
 
 
-https://firebase.google.com/docs/auth/web/start
+* https://firebase.google.com/docs/auth/web/start
 
 ### install
 ```html
@@ -107,7 +107,7 @@ bob.on('connection', (connection)=>{
 })
 ```
 
-Connections are just instances of [SimplePeer](https://github.com/feross/simple-peer#api) already connected!
+> Connections are just instances of [SimplePeer](https://github.com/feross/simple-peer#api) already connected!
 
 ## API
 ### `firepeer = new FirePeer(firebase, options?: FirePeerOptions)`
@@ -145,6 +145,6 @@ Returns a Promise that resolves a SimplePeer instance.
 
 P2P chat made with firepeer in 100 lines of JS, more or less. :D
 
-https://firepeer-demo.firebaseapp.com
-https://github.com/natzcam/firepeer-demo
+* https://firepeer-demo.firebaseapp.com
+* https://github.com/natzcam/firepeer-demo
 
