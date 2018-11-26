@@ -124,7 +124,7 @@ bob.on('connection', (connection)=>{
     }
     ```
     * spOpts - [SimplePeer](https://github.com/feross/simple-peer#api) constructor options.
-    * path parameters -
+    * *path parameters -
     `/{peersPath}/$uid/{offersPath}/$offerId/{uidPath}`
     `/{peersPath}/$uid/{offersPath}/$offerId/{answerPath}`
     * allowOffer - tests whether to allow an offer to proceed
