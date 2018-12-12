@@ -9,26 +9,32 @@ export declare interface FirePeer {
 
 export interface Signal extends SimplePeer.SignalData {
   uid: string;
+  id: string;
 }
 
 export interface FirePeerOptions {
+  id?: string;
   spOpts?: SimplePeer.Options;
   peersPath?: string;
   offersPath?: string;
   answerPath?: string;
   uidPath?: string;
+  idPath?: string;
   allowOffer?: (offer: Signal) => boolean;
 }
 
 export class FirePeer extends EventEmitter {
-  private ref?: firebase.database.Reference;
-  private refSub: any;
+  private offersRef?: firebase.database.Reference;
+  private offerRefSub: any;
+  private id = '';
   private spOpts: SimplePeer.Options = { trickle: false };
   private user: firebase.User | null | undefined;
   private peersPath = 'peers';
   private offersPath = 'offers';
   private answerPath = 'answer';
   private uidPath = 'uid';
+  private idPath = 'id';
+
   constructor(private fb: typeof firebase, options?: FirePeerOptions) {
     super();
     Object.assign(this, options);
@@ -43,10 +49,10 @@ export class FirePeer extends EventEmitter {
     });
   }
 
-  public connect(uid: string): Promise<SimplePeer.Instance> {
+  public connect(uid: string, id: string): Promise<SimplePeer.Instance> {
     const offersRef = this.fb
       .database()
-      .ref(`${this.peersPath}/${uid}/${this.offersPath}`);
+      .ref(`${this.peersPath}/${uid}/${id}/${this.offersPath}`);
 
     debug('connect() %s', offersRef.toString());
 
@@ -57,10 +63,12 @@ export class FirePeer extends EventEmitter {
         trickle: false
       });
       (peer as any).uid = uid;
+      (peer as any).id = id;
 
       peer.on('signal', (offer: any) => {
         if (this.user) {
           offer[this.uidPath] = this.user.uid;
+          offer[this.idPath] = this.id;
         }
 
         debug('connect() offer: %o', offer);
@@ -108,12 +116,14 @@ export class FirePeer extends EventEmitter {
   private allowOffer: (offer: Signal) => boolean = (offer: Signal) => true;
 
   private listen(user: firebase.User): void {
-    this.ref = this.fb
-      .database()
-      .ref(`${this.peersPath}/${user.uid}/${this.offersPath}`);
+    const userRef = this.fb.database().ref(`${this.peersPath}/${user.uid}`);
+    if (!this.id) {
+      this.id = userRef.push().key as string;
+    }
+    this.offersRef = userRef.child(`${this.id}/${this.offersPath}`);
 
-    debug('listen() to %s', this.ref.toString());
-    this.refSub = this.ref.on('child_added', offerSnapshot => {
+    debug('listen() to %s', this.offersRef.toString());
+    this.offerRefSub = this.offersRef.on('child_added', offerSnapshot => {
       if (offerSnapshot) {
         const offer = offerSnapshot.val() as Signal;
         if (offer) {
@@ -129,8 +139,8 @@ export class FirePeer extends EventEmitter {
   }
 
   private unlisten(): void {
-    if (this.ref && this.refSub) {
-      this.ref.off('child_added', this.refSub);
+    if (this.offersRef && this.offerRefSub) {
+      this.offersRef.off('child_added', this.offerRefSub);
     }
   }
 
@@ -141,6 +151,7 @@ export class FirePeer extends EventEmitter {
       trickle: false
     });
     (peer as any).uid = offer.uid;
+    (peer as any).id = offer.id;
 
     const cleanup = (err?: Error) => {
       if (err) {

@@ -22,6 +22,9 @@ test.after(async t => {
 
 test.serial('alice tries to connect to bob authenticated', async t => {
   const alice = new FirePeer(firebase, { spOpts: { wrtc } });
-  await alice.connect(process.env.BOB_UID as string);
+  await alice.connect(
+    process.env.BOB_UID as string,
+    'bobclient1'
+  );
   t.pass();
 });

@@ -19,7 +19,7 @@ test.after(async t => {
 });
 
 test.serial('bob waits for connection from alice authenticated', async t => {
-  const bob = new FirePeer(firebase, { spOpts: { wrtc } });
+  const bob = new FirePeer(firebase, { id: 'bobclient1', spOpts: { wrtc } });
   await waitConn(bob);
   t.pass();
 });
