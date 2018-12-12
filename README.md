@@ -133,12 +133,12 @@ bob.on('connection', (connection)=>{
   interface FirePeerOptions {
     id?: string
     spOpts?: SimplePeer.Options;
-    allowOffer?: (offer: Signal) => boolean;
+    allowOffer?: (offer: Signal) => boolean | Promise<boolean>;
   }
   ```
   - **id** - the client id. If not specified,then a client id will be generated
   - **spOpts** - [SimplePeer](https://github.com/feross/simple-peer#api) options
-  - **allowOffer** - tests whether to allow an offer to proceed
+  - **allowOffer** - tests whether to allow an offer to proceed, supports promises
   ```javascript
     allowOffer: function(offer) {
       return window.confirm(offer.id + " would like to connect.");
