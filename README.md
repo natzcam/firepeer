@@ -38,24 +38,28 @@ Add these security rules in the firebase console to secure the signalling data.
 }
 ```
 
-`$uid` - variable containing user id
-`$id` - variable containing client id, users can have multiple clients
+> `$uid` - variable containing user id
+> `$id` - variable containing client id, users can have multiple clients
 
 ```json
+// Ensures that user `$uid` is the only one who has read access to the offers received
+// and write access to send an answer on `/peers/$uid/$id/offers/$offerId/answer`
 "/peers/$uid/$id/offers":
     ".read": "auth != null && auth.uid == $uid",
     ".write": "auth != null && auth.uid == $uid"
 ```
 
-Ensures that user `$uid` is the only one who has read access to the offers received and write access to send an answer on `/peers/$uid/$id/offers/$offerId/answer`
 
 ```json
+// Ensures that the user who sent an offer only has read and one-time write access to that specific offer. 
+// Also guarantees that `/peers/$uid/$id/offers/$offerId/uid` is the uid of the user who sent that offer. 
+// Crucial in authenticating the other peer.
 "/peers/$uid/$id/offers/$offerId":
     ".read": "auth != null && data.child('uid').val() == auth.uid",
     ".write": "auth != null && !data.exists() && newData.child('uid').val() == auth.uid"
 ```
 
-Ensures that the user who sent an offer only has read and one-time write access to that specific offer. Also guarantees that `/peers/$uid/$id/offers/$offerId/uid` is the uid of the user who sent that offer. Crucial in authenticating the other peer.
+
 
 ### enable sign-in method
 
