@@ -24,7 +24,7 @@ Add these security rules in the firebase console to secure the signalling data.
           ".write": "auth != null && auth.uid == $uid",
           "$offerId": {
             ".read": "auth != null && data.child('uid').val() == auth.uid",
-            ".write": "auth != null && !data.exists() && newData.child('uid').val() == auth.uid",
+            ".write": "auth != null && !data.exists() && newData.child('uid').val() == auth.uid"
           }
         }
       }
