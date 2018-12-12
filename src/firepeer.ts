@@ -20,7 +20,7 @@ export interface FirePeerOptions {
   answerPath?: string;
   uidPath?: string;
   idPath?: string;
-  allowOffer?: (offer: Signal) => boolean;
+  allowOffer?: (offer: Signal) => boolean | Promise<boolean>;
 }
 
 export class FirePeer extends EventEmitter {
@@ -127,12 +127,20 @@ export class FirePeer extends EventEmitter {
       if (offerSnapshot) {
         const offer = offerSnapshot.val() as Signal;
         if (offer) {
-          if (this.allowOffer(offer)) {
-            this.incoming(offerSnapshot.ref, offer);
-          } else {
-            offerSnapshot.ref.set(null);
-            debug('listen() disallowed offer');
-          }
+          Promise.resolve(this.allowOffer(offer)).then(
+            (ao: boolean) => {
+              if (ao) {
+                this.incoming(offerSnapshot.ref, offer);
+              } else {
+                offerSnapshot.ref.set(null);
+                debug('listen() allowOffer false');
+              }
+            },
+            e => {
+              offerSnapshot.ref.set(null);
+              debug('listen() allowOffer rejected', e);
+            }
+          );
         }
       }
     });
