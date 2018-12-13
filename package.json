@@ -1,6 +1,6 @@
 {
   "name": "firepeer",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "easy and secure signalling for simple-peer through firebase",
   "main": "lib/firepeer.js",
   "browser": "lib/firepeer.min.js",
@@ -39,12 +39,12 @@
   "dependencies": {
     "debug": "^4.1.0",
     "firebase": "^5.5.4",
-    "simple-peer": "^9.1.2"
+    "simple-peer": "^9.1.2",
+    "@types/simple-peer": "^6.1.5"
   },
   "devDependencies": {
     "@types/debug": "0.0.31",
     "@types/dotenv": "^6.1.0",
-    "@types/simple-peer": "^6.1.5",
     "acorn": "^6.0.4",
     "ava": "1.0.0-beta.7",
     "babel-minify": "^0.5.0",
