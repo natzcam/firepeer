@@ -29,8 +29,8 @@
     "test:prettier": "prettier \"src/**/*.ts\" --list-different",
     "test:int": "cross-env DEBUG=firepeer ava lib/test/*.test.js",
     "version": "standard-version",
-    "release": "run-s test version",
-    "unit": "run-s clean build test:unit",
+    "inst": "npm install",
+    "release": "run-s inst test version",
     "int": "run-s clean build test:int"
   },
   "engines": {
