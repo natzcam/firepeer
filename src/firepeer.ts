@@ -35,7 +35,7 @@ export class FirePeer extends EventEmitter {
   private uidPath = 'uid';
   private idPath = 'id';
 
-  constructor(private fb: typeof firebase, options?: FirePeerOptions) {
+  constructor(private fb: firebase.app.App, options?: FirePeerOptions) {
     super();
     Object.assign(this, options);
 

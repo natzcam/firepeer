@@ -33,13 +33,10 @@
     "release": "run-s inst test version",
     "int": "run-s clean build test:int"
   },
-  "engines": {
-    "node": ">=8.9"
-  },
   "dependencies": {
     "debug": "^4.1.0",
-    "firebase": "^5.5.4",
-    "simple-peer": "^9.1.2",
+    "firebase": "^5.7.0",
+    "simple-peer": "^9.2.0",
     "@types/simple-peer": "^6.1.5"
   },
   "devDependencies": {
