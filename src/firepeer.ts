@@ -5,8 +5,10 @@ import * as SimplePeer from 'simple-peer';
 import debug from './debug';
 
 export interface FirePeerInstance extends SimplePeer.Instance {
-  uid: string;
-  id: string;
+  initiatorUid: string | null;
+  initiatorId: string | null;
+  receiverUid: string | null;
+  recieveirId: string | null;
 }
 export declare interface FirePeer {
   on(event: 'connection', listener: (peer: FirePeerInstance) => void): this;
@@ -23,7 +25,11 @@ export class FirePeer extends EventEmitter {
   public id: string;
   public uid?: string;
   public spOpts?: SimplePeer.Options;
-  private ref?: firebase.database.Reference;
+  public onOffer: (signal: Signal) => Promise<Signal> | Signal;
+  public onAnswer: (signal: Signal) => Promise<Signal> | Signal;
+  public sendOffer: (signal: Signal) => Promise<Signal> | Signal;
+  public sendAnswer: (signal: Signal) => Promise<Signal> | Signal;
+  private refs: firebase.database.Reference[] = [];
 
   constructor(options: Partial<FirePeer>) {
     super();
@@ -35,6 +41,18 @@ export class FirePeer extends EventEmitter {
 
     this.id = options.id ? options.id : shortid.generate();
     this.spOpts = options.spOpts ? options.spOpts : {};
+    this.onOffer = options.onOffer
+      ? options.onOffer
+      : (signal: Signal) => signal;
+    this.onAnswer = options.onAnswer
+      ? options.onAnswer
+      : (signal: Signal) => signal;
+    this.sendOffer = options.sendOffer
+      ? options.sendOffer
+      : (signal: Signal) => signal;
+    this.sendAnswer = options.sendAnswer
+      ? options.sendAnswer
+      : (signal: Signal) => signal;
 
     this.app.auth().onAuthStateChanged(user => {
       if (user) {
@@ -46,37 +64,42 @@ export class FirePeer extends EventEmitter {
   }
 
   public connect(uid: string, id: string): void {
+    if (!this.uid) {
+      throw new Error('need to be logged in in order to connect');
+    }
     this.createPeer(
-      this.app.database().ref(`peers/${uid}/${id}/${this.id}`),
+      this.app.database().ref(`peers/${uid}/${id}/${this.uid}/${this.id}`),
       true
     );
   }
 
   private listen(user: firebase.User): void {
+    this.refs = [];
     this.uid = user.uid;
-    this.ref = this.app.database().ref(`peers/${this.uid}/${this.id}`);
-
-    this.ref.on('child_added', ss => {
+    const ref = this.app.database().ref(`peers/${this.uid}/${this.id}`);
+    ref.on('child_added', ss => {
       if (ss) {
-        debug('%s: listen() to %s', this.id, ss.ref.toString());
-        this.createPeer(ss.ref, false);
+        ss.ref.on('child_added', css => {
+          if (css) {
+            this.createPeer(css.ref, false);
+          }
+        });
+        this.refs.push(ss.ref);
       }
     });
+    this.refs.push(ref);
   }
 
   private unlisten(): void {
-    if (this.ref) {
-      this.ref.off('child_added');
-    }
+    this.refs.forEach(r => {
+      r.off('child_added');
+    });
   }
-
-  // private allowOffer: (offer: Signal) => boolean = (offer: Signal) => true;
 
   private createPeer(
     ref: firebase.database.Reference,
     initiator: boolean
   ): FirePeerInstance {
-    debug('%s: createPeer() to %s, %s', this.id, ref.toString(), initiator);
     const peer = new SimplePeer({
       initiator,
       ...this.spOpts,
@@ -84,23 +107,30 @@ export class FirePeer extends EventEmitter {
     }) as FirePeerInstance;
 
     peer.on('signal', (signal: Signal) => {
-      debug('%s: on signal %s, %o', this.id, initiator, signal);
-      signal.id = this.id;
-      if (this.uid) {
-        signal.uid = this.uid;
-      }
-      ref.set(signal);
+      const p =
+        signal.type === 'offer'
+          ? Promise.resolve(this.sendOffer(signal))
+          : Promise.resolve(this.sendAnswer(signal));
+
+      p.then(sig => {
+        if (sig) {
+          ref.set(sig);
+        }
+      });
     });
 
     ref.on('value', ss => {
       if (ss) {
         const signal = ss.val();
         if (signal) {
-          debug('%s, on value %s, %o', this.id, initiator, signal);
           if (signal.type === 'offer' && !initiator) {
-            peer.signal(signal);
+            Promise.resolve(this.onOffer(signal)).then(sig => {
+              peer.signal(sig);
+            });
           } else if (signal.type === 'answer' && initiator) {
-            peer.signal(signal);
+            Promise.resolve(this.onAnswer(signal)).then(sig => {
+              peer.signal(sig);
+            });
           }
         }
       }
@@ -119,6 +149,16 @@ export class FirePeer extends EventEmitter {
     peer.on('error', cleanup);
     peer.on('connect', () => {
       cleanup();
+      peer.initiatorId = ref && ref.key;
+      peer.initiatorUid = ref && ref.parent && ref.parent.key;
+      peer.recieveirId =
+        ref && ref.parent && ref.parent.parent && ref.parent.parent.key;
+      peer.receiverUid =
+        ref &&
+        ref.parent &&
+        ref.parent.parent &&
+        ref.parent.parent.parent &&
+        ref.parent.parent.parent.key;
       this.emit('connection', peer);
     });
 

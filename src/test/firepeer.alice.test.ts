@@ -6,7 +6,17 @@ import { FirePeer } from '../firepeer';
 import firebase from './firebase.fixture';
 import { waitConn } from './utils';
 
-test.before(async t => {
+test.after(async t => {
+  await firebase.app().delete();
+});
+
+test.serial('alice tries to connect to bob authenticated', async t => {
+  const alice = new FirePeer({
+    app: firebase.app(),
+    id: 'alice',
+    spOpts: { wrtc }
+  });
+
   if (process.env.ALICE_EMAIL && process.env.ALICE_PASS) {
     await firebase
       .auth()
@@ -15,17 +25,10 @@ test.before(async t => {
         process.env.ALICE_PASS
       );
   }
-});
 
-test.after(async t => {
-  await firebase.app().delete();
-});
-
-test.serial('alice tries to connect to bob authenticated', async t => {
-  const alice = new FirePeer({ app: firebase.app(), spOpts: { wrtc } });
   await alice.connect(
     process.env.BOB_UID as string,
-    'bobclient1'
+    'bob'
   );
   await waitConn(alice);
   t.pass();
