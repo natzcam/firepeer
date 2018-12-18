@@ -4,11 +4,9 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Debug Test Int",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "int"],
-      "protocol": "inspector",
-      "console": "integratedTerminal"
+      "name": "Debug Test",
+      "program": "${workspaceRoot}/node_modules/ava/profile.js",
+      "args": ["${file}"]
     }
   ]
 }

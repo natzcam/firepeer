@@ -34,10 +34,11 @@
     "int": "run-s clean build test:int"
   },
   "dependencies": {
+    "@types/simple-peer": "^6.1.5",
     "debug": "^4.1.0",
     "firebase": "^5.7.0",
-    "simple-peer": "^9.2.0",
-    "@types/simple-peer": "^6.1.5"
+    "shortid": "^2.2.14",
+    "simple-peer": "^9.2.0"
   },
   "devDependencies": {
     "@types/debug": "0.0.31",
