@@ -123,6 +123,10 @@ bob.on('connection', (connection)=>{
 
 Connections are just instances of [SimplePeer](https://github.com/feross/simple-peer#api) already connected!
 
+## API Reference
+
+https://natzcam.github.io/firepeer
+
 ## Demo
 
 - https://firepeer-demo.firebaseapp.com
