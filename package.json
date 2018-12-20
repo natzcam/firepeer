@@ -1,6 +1,6 @@
 {
   "name": "firepeer",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "easy and secure signalling for simple-peer through firebase",
   "main": "lib/firepeer.js",
   "browser": "lib/firepeer.min.js",
