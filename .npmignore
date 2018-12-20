@@ -7,4 +7,4 @@ tslint.json
 .vscode
 .types
 *.log
-reference
+docs

@@ -61,13 +61,11 @@ Firepeer requires authentication so at the very least you have to select [Anonym
 - https://firebase.google.com/docs/auth/web/start
 
 ### install
-
-```html
+```js
 npm install --save firepeer
-
--or-
-
-<script src="https://cdn.jsdelivr.net/npm/firepeer@<FIREPEER_VERSION>/build/lib/firepeer.min.js"></script>
+```
+```html
+<script src="https://cdn.jsdelivr.net/npm/firepeer@<FIREPEER_VERSION>/lib/firepeer.min.js"></script>
 ```
 
 ### use firepeer
