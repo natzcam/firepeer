@@ -1,3 +1,5 @@
 import debug from 'debug';
 
-export default debug('firepeer');
+export default (id: string) => {
+  return debug('firepeer:' + id);
+};
