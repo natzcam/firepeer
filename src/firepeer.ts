@@ -5,6 +5,9 @@ import * as SimplePeer from 'simple-peer';
 import debug from './debug';
 
 /**
+ * The firepeer instance, just a [simple-peer](https://github.com/feross/simple-peer#api)
+ * instance in connected state.
+ *
  * @noInheritDoc
  */
 export interface FirePeerInstance extends SimplePeer.Instance {
@@ -13,31 +16,82 @@ export interface FirePeerInstance extends SimplePeer.Instance {
   receiverUid: string | null;
   receiverId: string | null;
 }
+
+/**
+ * Represents p2p signalling data. `error` is specific to firepeer and enables passing error information.
+ */
 export interface Signal extends SimplePeer.SignalData {
   type: 'offer' | 'answer';
   error?: string;
 }
 
+/**
+ * Intercepts signals to/from firepeer instances.
+ * For the signalling to proceed, firepeer expects the function to return a
+ * Promise resolving to a signal or a plain signal.
+ * Otherwise, return null or a promise rejection.
+ */
+export type SignalInterceptor = (signal: Signal) => Promise<Signal> | Signal;
+
 export interface FirePeerOptions {
+  /**
+   * The peer id to be used. Should be unique. If not specified, then a generated one will be used.
+   */
   id?: string;
+  /**
+   * Simple-peer [constructor options](https://github.com/feross/simple-peer#api).
+   */
   spOpts?: SimplePeer.Options;
-  onOffer?: (signal: Signal) => Promise<Signal> | Signal;
-  onAnswer?: (signal: Signal) => Promise<Signal> | Signal;
-  sendOffer?: (signal: Signal) => Promise<Signal> | Signal;
-  sendAnswer?: (signal: Signal) => Promise<Signal> | Signal;
+  /**
+   * [[SignalInterceptor]] called when an offer is received from the initiator.
+   */
+  onOffer?: SignalInterceptor;
+  /**
+   * [[SignalInterceptor]] called when an answer is received from the receiver.
+   */
+  onAnswer?: SignalInterceptor;
+  /**
+   * [[SignalInterceptor]] called when an offer is about to be sent by the initiator.
+   */
+  sendOffer?: SignalInterceptor;
+  /**
+   * [[SignalInterceptor]] called when an answer is about to be sent by the receiver.
+   */
+  sendAnswer?: SignalInterceptor;
 }
 
 export declare interface FirePeer {
+  /**
+   * Triggered when a new connection is established either initiated by you through [[FirePeer.connect]]
+   * or initiated by another peer.
+   */
   on(event: 'connection', listener: (peer: FirePeerInstance) => void): this;
+  /**
+   * Triggered when firebase auth state has changed. Firepeer only works if firebase is in authenticated state
+   * ([[FirePeer.uid]] is not null).
+   */
   on(event: 'loggedin' | 'loggedout', listener: () => void): this;
+  /**
+   * Triggered when an error happens in the signalling process.
+   */
   on(event: 'error', listener: (err: Error) => void): this;
 }
 
 /**
+ * Secure p2p signalling and authentication for [simple-peer](https://github.com/feross/simple-peer)
+ * using [firebase realtime database](https://firebase.google.com/docs/database/).
+ *
  * @noInheritDoc
  */
 export class FirePeer extends EventEmitter {
+  /**
+   * A unique string identifying this peer from other peers. Used as the `id` parameter in [[FirePeer.connect]].
+   */
   public id: string;
+  /**
+   * A unique string assigned by firebase when in authenticated state. This identifies the current user within firebase.
+   * Used as the `uid` parameter in [[FirePeer.connect]].
+   */
   public uid?: string | null;
   private app: firebase.app.App;
   private refs: firebase.database.Reference[] = [];
@@ -47,7 +101,14 @@ export class FirePeer extends EventEmitter {
   private sendOffer: (signal: Signal) => Promise<Signal> | Signal;
   private sendAnswer: (signal: Signal) => Promise<Signal> | Signal;
 
-  constructor(fbaseOrApp: any, options: FirePeerOptions = {}) {
+  /**
+   *
+   * @param fbaseOrApp Configured firebase instance or a specific firebase app if you have configured multiple apps.
+   */
+  constructor(
+    fbaseOrApp: firebase.app.App | any,
+    options: FirePeerOptions = {}
+  ) {
     super();
     this.app = fbaseOrApp as firebase.app.App;
 
@@ -79,6 +140,9 @@ export class FirePeer extends EventEmitter {
     });
   }
 
+  /**
+   * Connect to a peer identified by a user id and peer id. Returns a promise that resolves to a [[FirePeerInstance]].
+   */
   public connect(uid: string, id: string): Promise<FirePeerInstance> {
     return new Promise((resolve, reject) => {
       const connectPeer = () => {

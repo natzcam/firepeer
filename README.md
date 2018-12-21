@@ -1,66 +1,54 @@
 # firepeer
 
-secure signalling and authentication for [simple-peer](https://github.com/feross/simple-peer) using [firebase realtime database](https://firebase.google.com/docs/database/).
+Secure p2p signalling and authentication for [simple-peer](https://github.com/feross/simple-peer) using [firebase realtime database](https://firebase.google.com/docs/database/).
 
-## Getting Started
+## Setup firebase
 
-### setup firebase
+1. [Create a firebase project and setup the javascript client SDK](https://firebase.google.com/docs/database/web/start).
 
-Create a firebase project and setup the JS client SDK.
+2. Add these security rules in the firebase console to secure the signalling data.
 
-- https://firebase.google.com/docs/web/setup
-- https://firebase.google.com/docs/database/web/start
-
-### configure security rules
-
-Add these security rules in the firebase console to secure the signalling data.
-
-```json
-{
-  "rules": {
-    "peers": {
-      "$uid": {
-        "$id": {
-          ".read": "auth != null && auth.uid == $uid",
-          ".write": "auth != null && auth.uid == $uid",
-          "$otherUid": {
-            "$otherId": {
-              ".read": "auth != null && auth.uid == $otherUid",
-              ".write": "auth != null && auth.uid == $otherUid",
-              ".validate": "newData.hasChildren(['sdp', 'type']) || newData.hasChildren(['type', 'error'])",
-              "sdp": {
-                ".validate": "newData.isString() && newData.val().length < 4000"
-              },
-              "error": {
-                ".validate": "newData.isString() && newData.val().length < 1000"
-              },
-              "type": {
-                ".validate": "newData.val() == 'offer' || newData.val() == 'answer'"
+    ```json
+    {
+      "rules": {
+        "peers": {
+          "$uid": {
+            "$id": {
+              ".read": "auth != null && auth.uid == $uid",
+              ".write": "auth != null && auth.uid == $uid",
+              "$otherUid": {
+                "$otherId": {
+                  ".read": "auth != null && auth.uid == $otherUid",
+                  ".write": "auth != null && auth.uid == $otherUid",
+                  ".validate": "newData.hasChildren(['sdp', 'type']) || newData.hasChildren(['type', 'error'])",
+                  "sdp": {
+                    ".validate": "newData.isString() && newData.val().length < 4000"
+                  },
+                  "error": {
+                    ".validate": "newData.isString() && newData.val().length < 1000"
+                  },
+                  "type": {
+                    ".validate": "newData.val() == 'offer' || newData.val() == 'answer'"
+                  }
+                }
               }
             }
           }
         }
       }
     }
-  }
-}
-```
+    ```
 
-Signaling data is exchanged in `/peers/$uid/$id/$otherUid/$otherId`.
+    Signaling data is exchanged in `/peers/$uid/$id/$otherUid/$otherId`. Security rules ensure that only the intended users can access signalling data and the signals are valid.
 
-Security rules ensure that only the intended users can exchange signalling data and the signals are valid.
+    > Shortcut: `https://console.firebase.google.com/project/<YOUR_PROJECT_ID>/database/rules`
 
-- https://firebase.google.com/docs/database/security
 
-### enable sign-in method
+3. Enable your prefered sign-in method in the firebase console. Firepeer requires authentication so at the very least you have to select [anonymous authentication](https://firebase.google.com/docs/auth/web/anonymous-auth).
 
-By default, firebase does not enable any sign-in method. You will have to enable one in the firebase console. Right now, firebase supports Email/Password, Phone, Google, Facebook, Twitter, Github. 
+    > Shortcut: `https://console.firebase.google.com/project/<YOUR_PROJECT_ID>/authentication/providers`
 
-Firepeer requires authentication so at the very least you have to select [Anonymous authentication](https://firebase.google.com/docs/auth/web/anonymous-auth).
-
-- https://firebase.google.com/docs/auth/web/start
-
-### install
+### Install
 ```js
 npm install --save firepeer
 ```
@@ -68,7 +56,7 @@ npm install --save firepeer
 <script src="https://cdn.jsdelivr.net/npm/firepeer@<FIREPEER_VERSION>/lib/firepeer.min.js"></script>
 ```
 
-### use firepeer
+### Usage
 
 ```javascript
 //alice side
@@ -79,7 +67,7 @@ firebase.initializeApp({
 
 const alice = new FirePeer(firebase);
 
-console.log(alice.id) // client id of alice
+console.log(alice.id) // peer id of alice
 
 //authenticate with the sign-in method you enabled in the console
 await firebase.auth().signInWith*()
@@ -104,12 +92,12 @@ const bob = new FirePeer({
   app: firebase.app()
 });
 
-console.log(bob.id) // client id of bob
+console.log(bob.id) // id
 
 //authenticate
 await firebase.auth().signInWith*()
 
-console.log(bob.uid) // uid of bob
+console.log(bob.uid) // peer id of bob
 
 // wait for connection and receive message
 bob.on('connection', (connection)=>{
@@ -119,13 +107,8 @@ bob.on('connection', (connection)=>{
 })
 ```
 
-Connections are just instances of [SimplePeer](https://github.com/feross/simple-peer#api) already connected!
+Connections are just instances of [simple-peer](https://github.com/feross/simple-peer#api) already connected!
 
-## API Reference
+## [Reference](https://natzcam.github.io/firepeer)
 
-https://natzcam.github.io/firepeer
-
-## Demo
-
-- https://firepeer-demo.firebaseapp.com
-- https://github.com/natzcam/firepeer-demo
+## [Demo](https://firepeer-demo.firebaseapp.com)
