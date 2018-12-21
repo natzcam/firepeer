@@ -1,7 +1,7 @@
 {
   "name": "firepeer",
-  "version": "0.1.8",
-  "description": "easy and secure signalling for simple-peer through firebase",
+  "version": "0.1.9",
+  "description": "secure p2p signalling and authentication for simple-peer using firebase realtime database",
   "main": "lib/firepeer.js",
   "browser": "lib/firepeer.min.js",
   "typings": "lib/firepeer.d.ts",
@@ -23,7 +23,7 @@
     "build": "run-s build:*",
     "build:main": "tsc",
     "build:browser": "browserify -s FirePeer src/firepeer.ts -p [ tsify ] | minify > lib/firepeer.min.js",
-    "build:doc": "typedoc --out docs --mode file --readme none --excludeProtected --excludePrivate --excludeExternals src/firepeer.ts",
+    "build:doc": "typedoc --out docs --theme minimal --mode file --target ES6 --readme none --excludePrivate --includeDeclarations --excludeExternals src/firepeer.ts",
     "fix": "run-s fix:*",
     "fix:prettier": "prettier \"src/**/*.ts\" --write",
     "fix:tslint": "tslint --fix --project .",
