@@ -29,3 +29,32 @@ test('bob waits for connection from alice authenticated', async t => {
   t.is(peer.receiverUid, vars.BOB_UID);
   t.pass();
 });
+
+test('bob waits for connection from alice authenticated - allow', async t => {
+  const bob = new FirePeer(firebase, {
+    id: 'bob2',
+    onOffer: signal => {
+      t.is(signal.uid, vars.ALICE_UID);
+      return signal;
+    },
+    spOpts: { wrtc }
+  });
+
+  const peer = await waitConn(bob);
+  t.is(peer.initiatorId, 'alice2');
+  t.is(peer.initiatorUid, vars.ALICE_UID);
+  t.is(peer.receiverId, 'bob2');
+  t.is(peer.receiverUid, vars.BOB_UID);
+  t.pass();
+});
+
+// test('bob waits for connection from alice authenticated - deny', async t => {
+//   const bob = new FirePeer(firebase, {
+//     id: 'bob3',
+//     onOffer: signal => null,
+//     spOpts: { wrtc }
+//   });
+
+//   await waitEvent(bob, 'error');
+//   t.pass();
+// });

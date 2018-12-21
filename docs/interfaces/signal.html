@@ -923,13 +923,16 @@ img { max-width: 100%; }
 					<a href="signal.html#candidate" class="tsd-kind-icon">candidate</a>
 				</li>
 				<li class=" tsd-kind-property tsd-parent-kind-interface">
-					<a href="signal.html#error" class="tsd-kind-icon">error</a>
+					<a href="signal.html#id" class="tsd-kind-icon">id</a>
 				</li>
 				<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 					<a href="signal.html#sdp" class="tsd-kind-icon">sdp</a>
 				</li>
 				<li class=" tsd-kind-property tsd-parent-kind-interface">
 					<a href="signal.html#type" class="tsd-kind-icon">type</a>
+				</li>
+				<li class=" tsd-kind-property tsd-parent-kind-interface">
+					<a href="signal.html#uid" class="tsd-kind-icon">uid</a>
 				</li>
 			</ul>
 		</li>
@@ -968,9 +971,10 @@ img { max-width: 100%; }
 						<h3>Properties</h3>
 						<ul class="tsd-index-list">
 							<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="signal.html#candidate" class="tsd-kind-icon">candidate</a></li>
-							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="signal.html#error" class="tsd-kind-icon">error</a></li>
+							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="signal.html#id" class="tsd-kind-icon">id</a></li>
 							<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="signal.html#sdp" class="tsd-kind-icon">sdp</a></li>
 							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="signal.html#type" class="tsd-kind-icon">type</a></li>
+							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="signal.html#uid" class="tsd-kind-icon">uid</a></li>
 						</ul>
 					</section>
 				</div>
@@ -990,14 +994,19 @@ img { max-width: 100%; }
 				</aside>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-				<a name="error" class="tsd-anchor"></a>
-				<h3><span class="tsd-flag ts-flagOptional">Optional</span> error</h3>
-				<div class="tsd-signature tsd-kind-icon">error<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
+				<a name="id" class="tsd-anchor"></a>
+				<h3>id</h3>
+				<div class="tsd-signature tsd-kind-icon">id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/natzcam/firepeer/blob/84f136f/src/firepeer.ts#L25">firepeer.ts:25</a></li>
+						<li>Defined in <a href="https://github.com/natzcam/firepeer/blob/ccf83ed/src/firepeer.ts#L32">firepeer.ts:32</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The id of the peer where the signal came from</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 				<a name="sdp" class="tsd-anchor"></a>
@@ -1013,12 +1022,27 @@ img { max-width: 100%; }
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 				<a name="type" class="tsd-anchor"></a>
 				<h3>type</h3>
-				<div class="tsd-signature tsd-kind-icon">type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"offer"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"answer"</span></div>
+				<div class="tsd-signature tsd-kind-icon">type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"offer"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"answer"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"error"</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/natzcam/firepeer/blob/84f136f/src/firepeer.ts#L24">firepeer.ts:24</a></li>
+						<li>Defined in <a href="https://github.com/natzcam/firepeer/blob/ccf83ed/src/firepeer.ts#L24">firepeer.ts:24</a></li>
 					</ul>
 				</aside>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+				<a name="uid" class="tsd-anchor"></a>
+				<h3>uid</h3>
+				<div class="tsd-signature tsd-kind-icon">uid<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+				<aside class="tsd-sources">
+					<ul>
+						<li>Defined in <a href="https://github.com/natzcam/firepeer/blob/ccf83ed/src/firepeer.ts#L28">firepeer.ts:28</a></li>
+					</ul>
+				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The uid of the peer where the signal came from</p>
+					</div>
+				</div>
 			</section>
 		</section>
 		<footer class="with-border-bottom">

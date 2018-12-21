@@ -1,3 +1,4 @@
+import { EventEmitter } from 'events';
 import { FirePeer, FirePeerInstance } from '../firepeer';
 
 export const waitConn = (firePeer: FirePeer): Promise<FirePeerInstance> => {
@@ -11,6 +12,14 @@ export const waitConn = (firePeer: FirePeer): Promise<FirePeerInstance> => {
 export const waitData = (connection: FirePeerInstance) => {
   return new Promise<any>((resolve, reject) => {
     connection.on('data', (data: any) => {
+      resolve(data);
+    });
+  });
+};
+
+export const waitEvent = (emitter: EventEmitter, event: string) => {
+  return new Promise<any>((resolve, reject) => {
+    emitter.on(event, (data: any) => {
       resolve(data);
     });
   });

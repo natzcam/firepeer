@@ -35,3 +35,34 @@ test('alice tries to connect to bob authenticated', async t => {
   t.is(peer.receiverUid, vars.BOB_UID);
   t.pass();
 });
+
+test('alice tries to connect to bob authenticated - allow', async t => {
+  const alice = new FirePeer(firebase, {
+    id: 'alice2',
+    spOpts: { wrtc }
+  });
+
+  const peer = await alice.connect(
+    vars.BOB_UID as string,
+    'bob2'
+  );
+  t.is(peer.initiatorId, 'alice2');
+  t.is(peer.initiatorUid, vars.ALICE_UID);
+  t.is(peer.receiverId, 'bob2');
+  t.is(peer.receiverUid, vars.BOB_UID);
+  t.pass();
+});
+
+// test('alice tries to connect to bob authenticated - deny', async t => {
+//   const alice = new FirePeer(firebase, {
+//     id: 'alice3',
+//     spOpts: { wrtc }
+//   });
+
+//   await t.throwsAsync(
+//     alice.connect(
+//       vars.BOB_UID as string,
+//       'bob3'
+//     )
+//   );
+// });

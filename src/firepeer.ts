@@ -21,8 +21,15 @@ export interface FirePeerInstance extends SimplePeer.Instance {
  * Represents p2p signalling data. `error` is specific to firepeer and enables passing error information.
  */
 export interface Signal extends SimplePeer.SignalData {
-  type: 'offer' | 'answer';
-  error?: string;
+  type: 'offer' | 'answer' | 'error';
+  /**
+   * The uid of the peer where the signal came from
+   */
+  uid: string;
+  /**
+   * The id of the peer where the signal came from
+   */
+  id: string;
 }
 
 /**
@@ -31,7 +38,9 @@ export interface Signal extends SimplePeer.SignalData {
  * Promise resolving to a signal or a plain signal.
  * Otherwise, return null or a promise rejection.
  */
-export type SignalInterceptor = (signal: Signal) => Promise<Signal> | Signal;
+export type SignalInterceptor = (
+  signal: Signal
+) => Promise<Signal> | Signal | null;
 
 export interface FirePeerOptions {
   /**
@@ -96,10 +105,10 @@ export class FirePeer extends EventEmitter {
   private app: firebase.app.App;
   private refs: firebase.database.Reference[] = [];
   private spOpts?: SimplePeer.Options;
-  private onOffer: (signal: Signal) => Promise<Signal> | Signal;
-  private onAnswer: (signal: Signal) => Promise<Signal> | Signal;
-  private sendOffer: (signal: Signal) => Promise<Signal> | Signal;
-  private sendAnswer: (signal: Signal) => Promise<Signal> | Signal;
+  private onOffer: SignalInterceptor;
+  private onAnswer: SignalInterceptor;
+  private sendOffer: SignalInterceptor;
+  private sendAnswer: SignalInterceptor;
 
   /**
    *
@@ -155,7 +164,7 @@ export class FirePeer extends EventEmitter {
         peer.on('connect', () => {
           resolve(peer);
         });
-        peer.on('error', err => {
+        peer.on('connect_error', err => {
           reject(err);
         });
       };
@@ -212,6 +221,19 @@ export class FirePeer extends EventEmitter {
     initiator: boolean
   ): FirePeerInstance {
     debug(this.id)('createPeer(): initiator: %s, %s', initiator, ref);
+
+    const initiatorId = (ref && ref.key) as string;
+    const initiatorUid = (ref && ref.parent && ref.parent.key) as string;
+    const receiverId = (ref &&
+      ref.parent &&
+      ref.parent.parent &&
+      ref.parent.parent.key) as string;
+    const receiverUid = (ref &&
+      ref.parent &&
+      ref.parent.parent &&
+      ref.parent.parent.parent &&
+      ref.parent.parent.parent.key) as string;
+
     const peer = new SimplePeer({
       initiator,
       ...this.spOpts,
@@ -219,11 +241,11 @@ export class FirePeer extends EventEmitter {
     }) as FirePeerInstance;
 
     peer.on('signal', (signal: Signal) => {
-      Promise.resolve(
-        signal.type === 'offer'
-          ? this.sendOffer(signal)
-          : this.sendAnswer(signal)
-      ).then(
+      const result = (signal.type === 'offer'
+        ? this.sendOffer(signal)
+        : this.sendAnswer(signal)) as Promise<Signal> | Signal;
+
+      Promise.resolve(result).then(
         sig => {
           if (sig) {
             debug(this.id)('local signal: %s', signal.type);
@@ -248,31 +270,24 @@ export class FirePeer extends EventEmitter {
               (signal.type === 'offer' && !initiator) ||
               (signal.type === 'answer' && initiator)
             ) {
-              if (signal.error) {
-                debug(this.id)(signal.error);
-                peer.emit('error', signal.error);
+              if (signal.type === 'offer') {
+                signal.uid = initiatorUid;
+                signal.id = initiatorId;
               } else {
-                Promise.resolve(
-                  signal.type === 'offer'
-                    ? this.onOffer(signal)
-                    : this.onAnswer(signal)
-                ).then(
-                  sig => {
-                    if (sig) {
-                      debug(this.id)('remote signal: %s', signal.type);
-                      peer.signal(sig);
-                    } else {
-                      debug(this.id)('remote signal rejected: %s', signal.type);
-                      ref.set(
-                        {
-                          error: 'signal rejected by remote peer',
-                          type: signal.type
-                        },
-                        this.handleError
-                      );
-                    }
-                  },
-                  () => {
+                signal.uid = receiverUid;
+                signal.id = receiverId;
+              }
+
+              const result = (signal.type === 'offer'
+                ? this.onOffer(signal)
+                : this.onAnswer(signal)) as Promise<Signal> | Signal;
+
+              Promise.resolve(result).then(
+                sig => {
+                  if (sig) {
+                    debug(this.id)('remote signal: %s', signal.type);
+                    peer.signal(sig);
+                  } else {
                     debug(this.id)('remote signal rejected: %s', signal.type);
                     ref.set(
                       {
@@ -282,8 +297,21 @@ export class FirePeer extends EventEmitter {
                       this.handleError
                     );
                   }
-                );
-              }
+                },
+                () => {
+                  debug(this.id)('remote signal rejected: %s', signal.type);
+                  ref.set(
+                    {
+                      sdp: 'signal rejected by remote peer',
+                      type: 'error'
+                    },
+                    this.handleError
+                  );
+                }
+              );
+            } else if (signal.type === 'error') {
+              peer.emit('connect_error', signal.sdp);
+              this.emit('error', signal.sdp);
             }
           }
         }
@@ -302,16 +330,11 @@ export class FirePeer extends EventEmitter {
       debug(this.id)('connection established');
 
       cleanup();
-      peer.initiatorId = ref && ref.key;
-      peer.initiatorUid = ref && ref.parent && ref.parent.key;
-      peer.receiverId =
-        ref && ref.parent && ref.parent.parent && ref.parent.parent.key;
-      peer.receiverUid =
-        ref &&
-        ref.parent &&
-        ref.parent.parent &&
-        ref.parent.parent.parent &&
-        ref.parent.parent.parent.key;
+
+      peer.initiatorId = initiatorId;
+      peer.initiatorUid = initiatorUid;
+      peer.receiverId = receiverId;
+      peer.receiverUid = receiverUid;
 
       this.emit('connection', peer);
     });
