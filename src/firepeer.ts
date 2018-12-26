@@ -11,9 +11,21 @@ import debug from './debug';
  * @noInheritDoc
  */
 export interface FirePeerInstance extends SimplePeer.Instance {
+  /**
+   * The uid of the initiator of the connection
+   */
   initiatorUid: string | null;
+  /**
+   * The peer id of the initiator of the connection
+   */
   initiatorId: string | null;
+  /**
+   * The uid of the receiver of the connection
+   */
   receiverUid: string | null;
+  /**
+   * The peer id of the receiver of the connection
+   */
   receiverId: string | null;
 }
 
@@ -80,10 +92,6 @@ export declare interface FirePeer {
    * ([[FirePeer.uid]] is not null).
    */
   on(event: 'loggedin' | 'loggedout', listener: () => void): this;
-  /**
-   * Triggered when an error happens in the signalling process.
-   */
-  on(event: 'error', listener: (err: Error) => void): this;
 }
 
 /**
@@ -164,7 +172,7 @@ export class FirePeer extends EventEmitter {
         peer.on('connect', () => {
           resolve(peer);
         });
-        peer.on('connect_error', err => {
+        peer.on('_connect_error', err => {
           reject(err);
         });
       };
@@ -177,34 +185,19 @@ export class FirePeer extends EventEmitter {
     });
   }
 
-  private handleError(err: Error | null): void {
-    if (err) {
-      debug(this.id)(err);
-      this.emit('error', err);
-    }
-  }
-
   private listen(): void {
     this.refs = [];
     const ref = this.app.database().ref(`peers/${this.uid}/${this.id}`);
-    ref.on(
-      'child_added',
-      ss => {
-        if (ss) {
-          ss.ref.on(
-            'child_added',
-            css => {
-              if (css) {
-                this.createPeer(css.ref, false);
-              }
-            },
-            this.handleError
-          );
-          this.refs.push(ss.ref);
-        }
-      },
-      this.handleError
-    );
+    ref.on('child_added', ss => {
+      if (ss) {
+        ss.ref.on('child_added', css => {
+          if (css) {
+            this.createPeer(css.ref, false);
+          }
+        });
+        this.refs.push(ss.ref);
+      }
+    });
     this.refs.push(ref);
     debug(this.id)('listening to %s', ref);
   }
@@ -241,17 +234,16 @@ export class FirePeer extends EventEmitter {
     }) as FirePeerInstance;
 
     peer.on('signal', (signal: Signal) => {
-      const result = (signal.type === 'offer'
-        ? this.sendOffer(signal)
-        : this.sendAnswer(signal)) as Promise<Signal> | Signal;
+      const result =
+        signal.type === 'offer'
+          ? this.sendOffer(signal)
+          : this.sendAnswer(signal);
 
-      Promise.resolve(result).then(
+      Promise.resolve(result ? result : Promise.reject()).then(
         sig => {
           if (sig) {
             debug(this.id)('local signal: %s', signal.type);
-            ref.set(sig, this.handleError);
-          } else {
-            debug(this.id)('local signal empty: %s', signal.type);
+            ref.set(sig);
           }
         },
         () => {
@@ -260,68 +252,52 @@ export class FirePeer extends EventEmitter {
       );
     });
 
-    ref.on(
-      'value',
-      ss => {
-        if (ss) {
-          const signal = ss.val() as Signal;
-          if (signal) {
-            if (
-              (signal.type === 'offer' && !initiator) ||
-              (signal.type === 'answer' && initiator)
-            ) {
-              if (signal.type === 'offer') {
-                signal.uid = initiatorUid;
-                signal.id = initiatorId;
-              } else {
-                signal.uid = receiverUid;
-                signal.id = receiverId;
-              }
-
-              const result = (signal.type === 'offer'
-                ? this.onOffer(signal)
-                : this.onAnswer(signal)) as Promise<Signal> | Signal;
-
-              Promise.resolve(result).then(
-                sig => {
-                  if (sig) {
-                    debug(this.id)('remote signal: %s', signal.type);
-                    peer.signal(sig);
-                  } else {
-                    debug(this.id)('remote signal rejected: %s', signal.type);
-                    ref.set(
-                      {
-                        error: 'signal rejected by remote peer',
-                        type: signal.type
-                      },
-                      this.handleError
-                    );
-                  }
-                },
-                () => {
-                  debug(this.id)('remote signal rejected: %s', signal.type);
-                  ref.set(
-                    {
-                      sdp: 'signal rejected by remote peer',
-                      type: 'error'
-                    },
-                    this.handleError
-                  );
-                }
-              );
-            } else if (signal.type === 'error') {
-              peer.emit('connect_error', signal.sdp);
-              this.emit('error', signal.sdp);
+    ref.on('value', ss => {
+      if (ss) {
+        const signal = ss.val() as Signal;
+        if (signal) {
+          if (
+            (signal.type === 'offer' && !initiator) ||
+            (signal.type === 'answer' && initiator)
+          ) {
+            if (signal.type === 'offer') {
+              signal.uid = initiatorUid;
+              signal.id = initiatorId;
+            } else {
+              signal.uid = receiverUid;
+              signal.id = receiverId;
             }
+
+            const result =
+              signal.type === 'offer'
+                ? this.onOffer(signal)
+                : this.onAnswer(signal);
+
+            Promise.resolve(result ? result : Promise.reject()).then(
+              sig => {
+                if (sig) {
+                  debug(this.id)('remote signal: %s', signal.type);
+                  peer.signal(sig);
+                }
+              },
+              () => {
+                debug(this.id)('remote signal rejected: %s', signal.type);
+                ref.set({
+                  sdp: 'signal rejected by remote peer',
+                  type: 'error'
+                });
+              }
+            );
+          } else if (signal.type === 'error') {
+            peer.emit('_connect_error', signal.sdp);
           }
         }
-      },
-      this.handleError
-    );
+      }
+    });
 
     const cleanup = () => {
       ref.off('value');
-      ref.set(null, this.handleError);
+      ref.set(null);
       debug(this.id)('cleanup');
     };
 

@@ -55,6 +55,6 @@ test('bob waits for connection from alice authenticated - allow', async t => {
 //     spOpts: { wrtc }
 //   });
 
-//   await waitEvent(bob, 'error');
+//   await waitEvent(bob, 'connection_error');
 //   t.pass();
 // });
