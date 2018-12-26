@@ -4,7 +4,7 @@ dotenv.config();
 import * as wrtc from 'wrtc';
 import { FirePeer } from '../firepeer';
 import firebase from './firebase.fixture';
-import { vars, waitConn } from './utils';
+import { vars, waitConn, waitEvent } from './utils';
 
 test.before(async t => {
   await firebase
@@ -48,13 +48,13 @@ test('bob waits for connection from alice authenticated - allow', async t => {
   t.pass();
 });
 
-// test('bob waits for connection from alice authenticated - deny', async t => {
-//   const bob = new FirePeer(firebase, {
-//     id: 'bob3',
-//     onOffer: signal => null,
-//     spOpts: { wrtc }
-//   });
+test('bob waits for connection from alice authenticated - deny', async t => {
+  const bob = new FirePeer(firebase, {
+    id: 'bob3',
+    onOffer: signal => null,
+    spOpts: { wrtc }
+  });
 
-//   await waitEvent(bob, 'connection_error');
-//   t.pass();
-// });
+  await waitEvent(bob, 'connection_failed');
+  t.pass();
+});

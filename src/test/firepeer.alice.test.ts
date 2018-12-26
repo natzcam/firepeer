@@ -53,19 +53,19 @@ test('alice tries to connect to bob authenticated - allow', async t => {
   t.pass();
 });
 
-// test.cb('alice tries to connect to bob authenticated - deny', t => {
-//   const alice = new FirePeer(firebase, {
-//     id: 'alice3',
-//     spOpts: { wrtc }
-//   });
+test.cb('alice tries to connect to bob authenticated - deny', t => {
+  const alice = new FirePeer(firebase, {
+    id: 'alice3',
+    spOpts: { wrtc }
+  });
 
-//   alice
-//     .connect(
-//       vars.BOB_UID as string,
-//       'bob3'
-//     )
-//     .catch(err => {
-//       t.is(err, 'signal rejected by remote peer');
-//       t.end();
-//     });
-// });
+  alice
+    .connect(
+      vars.BOB_UID as string,
+      'bob3'
+    )
+    .catch(err => {
+      t.is(err, 'signal rejected by remote peer');
+      t.end();
+    });
+});

@@ -88,6 +88,11 @@ export declare interface FirePeer {
    */
   on(event: 'connection', listener: (peer: FirePeerInstance) => void): this;
   /**
+   * Triggered when a connection failed either through [[FirePeer.connect]]
+   * or initiated by another peer.
+   */
+  on(event: 'connection_failed', listener: (error: Error) => void): this;
+  /**
    * Triggered when firebase auth state has changed. Firepeer only works if firebase is in authenticated state
    * ([[FirePeer.uid]] is not null).
    */
@@ -290,6 +295,7 @@ export class FirePeer extends EventEmitter {
             );
           } else if (signal.type === 'error') {
             peer.emit('_connect_error', signal.sdp);
+            this.emit('connection_failed', new Error(signal.sdp));
           }
         }
       }
