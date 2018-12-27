@@ -1,6 +1,6 @@
 {
   "name": "firepeer",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "description": "secure p2p signalling and authentication for simple-peer using firebase realtime database",
   "main": "lib/firepeer.js",
   "browser": "lib/firepeer.min.js",
