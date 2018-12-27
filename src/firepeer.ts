@@ -116,7 +116,7 @@ export class FirePeer extends EventEmitter {
    */
   public uid?: string | null;
   private app: firebase.app.App;
-  private refs: firebase.database.Reference[] = [];
+  private ref?: firebase.database.Reference;
   private spOpts?: SimplePeer.Options;
   private onOffer: SignalInterceptor;
   private onAnswer: SignalInterceptor;
@@ -191,27 +191,29 @@ export class FirePeer extends EventEmitter {
   }
 
   private listen(): void {
-    this.refs = [];
-    const ref = this.app.database().ref(`peers/${this.uid}/${this.id}`);
-    ref.on('child_added', ss => {
+    this.ref = this.app.database().ref(`peers/${this.uid}/${this.id}`);
+    this.ref.on('child_added', ss => {
       if (ss) {
         ss.ref.on('child_added', css => {
           if (css) {
             this.createPeer(css.ref, false);
           }
         });
-        this.refs.push(ss.ref);
       }
     });
-    this.refs.push(ref);
-    debug(this.id)('listening to %s', ref);
+    this.ref.on('child_removed', ss => {
+      if (ss) {
+        debug(this.id)('unlistening to %s', ss.ref);
+        ss.ref.off('child_added');
+      }
+    });
   }
 
   private unlisten(): void {
-    this.refs.forEach(r => {
-      debug(this.id)('unlisten to %s', r);
-      r.off('child_added');
-    });
+    if (this.ref) {
+      debug(this.id)('unlisten to %s', this.ref);
+      this.ref.off('child_added');
+    }
   }
 
   private createPeer(
@@ -219,15 +221,12 @@ export class FirePeer extends EventEmitter {
     initiator: boolean
   ): FirePeerInstance {
     debug(this.id)('createPeer(): initiator: %s, %s', initiator, ref);
-
-    const initiatorId = (ref && ref.key) as string;
-    const initiatorUid = (ref && ref.parent && ref.parent.key) as string;
-    const receiverId = (ref &&
-      ref.parent &&
+    const initiatorId = ref.key as string;
+    const initiatorUid = (ref.parent && ref.parent.key) as string;
+    const receiverId = (ref.parent &&
       ref.parent.parent &&
       ref.parent.parent.key) as string;
-    const receiverUid = (ref &&
-      ref.parent &&
+    const receiverUid = (ref.parent &&
       ref.parent.parent &&
       ref.parent.parent.parent &&
       ref.parent.parent.parent.key) as string;
@@ -308,6 +307,10 @@ export class FirePeer extends EventEmitter {
       debug(this.id)('cleanup');
     };
 
+    peer.on('error', err => {
+      debug(err && err.message);
+      cleanup();
+    });
     peer.on('close', cleanup);
     peer.on('connect', () => {
       debug(this.id)('connection established');
