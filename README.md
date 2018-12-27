@@ -20,13 +20,13 @@ Secure p2p signalling and authentication for [simple-peer](https://github.com/fe
                 "$otherId": {
                   ".read": "auth != null && auth.uid == $otherUid",
                   ".write": "auth != null && auth.uid == $otherUid",
-                  ".validate": "newData.hasChildren(['sdp', 'type'])",
                   "sdp": {
                     ".validate": "newData.isString() && newData.val().length < 4000"
                   },
                   "type": {
                     ".validate": "newData.val() == 'offer' || newData.val() == 'answer' || newData.val() == 'error'"
-                  }
+                  },
+                  "$other": { ".validate": false }
                 }
               }
             }

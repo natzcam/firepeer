@@ -139,7 +139,8 @@ test.serial('invalid set #4', async t => {
       .database()
       .ref(`/peers/${vars.ALICE_UID}/test/${vars.CHARLIE_UID}/test`)
       .set({
-        error: new Array(1000 + 1).join('e'), // invalid
+        invalid: 'invalid',
+        sdp: 'hey',
         type: 'offer'
       })
   );

@@ -294,6 +294,7 @@ export class FirePeer extends EventEmitter {
               }
             );
           } else if (signal.type === 'error') {
+            ref.set(null);
             peer.emit('_connect_error', signal.sdp);
             this.emit('connection_failed', new Error(signal.sdp));
           }
