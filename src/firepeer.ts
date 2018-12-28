@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 import firebase from 'firebase';
-import * as shortid from 'shortid';
-import * as SimplePeer from 'simple-peer';
+import shortid from 'shortid';
+import SimplePeer from 'simple-peer';
 import debug from './debug';
 
 /**
