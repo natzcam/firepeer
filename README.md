@@ -2,6 +2,10 @@
 
 Secure p2p signalling and authentication for [simple-peer](https://github.com/feross/simple-peer) using [firebase realtime database](https://firebase.google.com/docs/database/).
 
+[![Version](https://img.shields.io/npm/v/firepeer.svg)](https://npmjs.org/package/firepeer)
+[![Downloads/week](https://img.shields.io/npm/dw/firepeer.svg)](https://npmjs.org/package/firepeer)
+[![License](https://img.shields.io/npm/l/firepeer.svg)](https://github.com/natzcam/firepeer/blob/master/package.json)
+
 ## Setup firebase
 
 1. [Create a firebase project and setup the javascript client SDK](https://firebase.google.com/docs/database/web/start).
