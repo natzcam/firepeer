@@ -7,8 +7,6 @@ import debug from './debug';
 /**
  * The firepeer instance, just a [simple-peer](https://github.com/feross/simple-peer#api)
  * instance in connected state.
- *
- * @noInheritDoc
  */
 export interface FirePeerInstance extends SimplePeer.Instance {
   /**
@@ -103,7 +101,6 @@ export declare interface FirePeer {
  * Secure p2p signalling and authentication for [simple-peer](https://github.com/feross/simple-peer)
  * using [firebase realtime database](https://firebase.google.com/docs/database/).
  *
- * @noInheritDoc
  */
 export class FirePeer extends EventEmitter {
   /**
