@@ -111,9 +111,12 @@ bob.on('connection', (connection)=>{
 Connections are just instances of [simple-peer](https://github.com/feross/simple-peer#api) already connected!
 
 ## Reference
+
 [https://natzcam.github.io/firepeer](https://natzcam.github.io/firepeer)
 
 ## Demo
+
 [https://firepeer-demo.firebaseapp.com](https://firepeer-demo.firebaseapp.com)
+
 Source:
 [https://github.com/natzcam/firepeer-demo](https://github.com/natzcam/firepeer-demo)
