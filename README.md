@@ -40,12 +40,12 @@ Secure p2p signalling and authentication for [simple-peer](https://github.com/fe
     }
     ```
 
-    Signaling data is exchanged in `/peers/$uid/$id/$otherUid/$otherId`. Security rules ensure that only the intended users can access signalling data and the signals are valid.
+    Signaling data is exchanged in `/peers/$uid/$id/$otherUid/$otherId`. Security rules ensure that only intended users can access signalling data and signals are valid.
 
     > Shortcut: `https://console.firebase.google.com/project/<YOUR_PROJECT_ID>/database/rules`
 
 
-3. Enable your prefered sign-in method in the firebase console. Firepeer requires authentication so at the very least you have to select [anonymous authentication](https://firebase.google.com/docs/auth/web/anonymous-auth).
+3. Enable your prefered sign-in method in the firebase console. Firepeer requires authentication, so at the very least, you have to select [anonymous authentication](https://firebase.google.com/docs/auth/web/anonymous-auth).
 
     > Shortcut: `https://console.firebase.google.com/project/<YOUR_PROJECT_ID>/authentication/providers`
 
@@ -110,6 +110,10 @@ bob.on('connection', (connection)=>{
 
 Connections are just instances of [simple-peer](https://github.com/feross/simple-peer#api) already connected!
 
-## [Reference](https://natzcam.github.io/firepeer)
+## Reference
+[https://natzcam.github.io/firepeer](https://natzcam.github.io/firepeer)
 
-## [Demo](https://firepeer-demo.firebaseapp.com)
+## Demo
+[https://firepeer-demo.firebaseapp.com](https://firepeer-demo.firebaseapp.com)
+Source:
+[https://github.com/natzcam/firepeer-demo](https://github.com/natzcam/firepeer-demo)
